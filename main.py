@@ -1,9 +1,9 @@
 from injector import Injector
 
-from utils.services.production.API.DeepSeekService.deep_seek_service import (
+from utils.services.production.DeepSeekService.deep_seek_service import (
     DeepSeekService,
 )
-from utils.services.mock.API.DeepSeekService.deep_seek_service_mock import (
+from utils.services.mock.DeepSeekService.deep_seek_service_mock import (
     DeepSeekServiceMock,
 )
 from utils.services.ServiceLocator.service_locator import ServicesInjector

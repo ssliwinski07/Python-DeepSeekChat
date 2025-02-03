@@ -1,14 +1,15 @@
-from utils.services.production.API.DeepSeekService.deep_seek_service import (
+from utils.services.production.DeepSeekService.deep_seek_service import (
     DeepSeekService,
 )
 from utils.models.DeepSeek.user_message_model import UserMessageModel
 from utils.models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
+from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
 from utils.consts.consts import USER_ROLE
 
 
 class DeepSeekVM:
 
-    def __init__(self, deep_seek_service: DeepSeekService):
+    def __init__(self, deep_seek_service: DeepSeekServiceBase):
         self.deep_seek_service = deep_seek_service
 
     def start_chat(self):
