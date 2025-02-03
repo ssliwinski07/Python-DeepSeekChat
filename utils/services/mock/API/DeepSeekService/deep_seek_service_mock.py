@@ -16,8 +16,6 @@ class DeepSeekServiceMock(DeepSeekServiceBase):
     def send_msg(self, messages: List[dict]) -> DeepSeekResponseModel:
 
         try:
-            ##choices = [DeepSeekChoiceModel(**choice) for choice in response.choices]
-
             choices = [
                 DeepSeekChoiceModel(message=DeepSeekMessageModel(content="Hi there")),
             ]
