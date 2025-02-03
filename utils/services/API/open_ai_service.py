@@ -1,34 +1,36 @@
 import openai
-from openai.types.chat import ChatCompletion
 from typing import List
 from injector import singleton
+from openai.types.chat import ChatCompletion
 
-from utils.consts.consts import BASE_API, DEEP_SEEK_CHAT_MODEL
 from utils.models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
-from utils.services.ServiceLocator.configs.deep_seek_config import DeepSeekConfig
-from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
+from utils.services.ServiceLocator.configs.open_ai_config import OpenAIConfig
+from utils.consts.consts import BASE_API, DEEP_SEEK_CHAT_MODEL
 
 
 @singleton
-class DeepSeekService(DeepSeekServiceBase):
+class OpenAiService:
 
-    def __init__(self, config: DeepSeekConfig):
+    def __init__(self, config: OpenAIConfig):
         self.config = config
-        self.client: openai.OpenAI = None
+
+    __client: openai.OpenAI = None
+
+    def open_client(self):
+        if not self.__client:
+            if not self.config.ai_api_key:
+                raise ValueError("system variable with token is not set")
+
+            self.__client = openai.OpenAI(
+                api_key=self.config.ai_api_key, base_url=BASE_API
+            )
+
+    def message(self, messages: List[dict]) -> DeepSeekResponseModel:
 
         self.open_client()
 
-    def open_client(self):
-        if not self.client:
-            if not self.config.ai_token:
-                raise ValueError("system variable with token is not set")
-
-            self.client = openai.OpenAI(api_key=self.config.ai_token, base_url=BASE_API)
-
-    def send_msg(self, messages: List[dict]) -> DeepSeekResponseModel:
-
         try:
-            response: ChatCompletion = self.client.chat.completions.create(
+            response: ChatCompletion = self.__client.chat.completions.create(
                 model=DEEP_SEEK_CHAT_MODEL,
                 messages=messages,
                 stream=False,

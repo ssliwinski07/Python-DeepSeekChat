@@ -3,10 +3,13 @@ from injector import Injector, Module, provider, singleton
 
 from utils.helpers.enums import ServiceType
 from utils.services.ServiceLocator.configs.deep_seek_config import DeepSeekConfig
-from utils.services.production.API.DeepSeekService.deep_seek_service import (
+from utils.services.ServiceLocator.configs.open_ai_config import OpenAIConfig
+from utils.services.API.open_ai_service import OpenAiService
+from utils.consts.consts import DEEP_SEEK_API_KEY
+from utils.services.production.DeepSeekService.deep_seek_service import (
     DeepSeekService,
 )
-from utils.services.mock.API.DeepSeekService.deep_seek_service_mock import (
+from utils.services.mock.DeepSeekService.deep_seek_service_mock import (
     DeepSeekServiceMock,
 )
 
@@ -15,66 +18,72 @@ class ServiceLocatorModule(Module):
 
     def __init__(
         self,
-        deep_seek_config: DeepSeekConfig,
+        open_ai_config: OpenAIConfig,
         service_type: ServiceType = ServiceType.PRODUCTION,
     ):
         self.service_type = service_type
-        self.deep_seek_config = deep_seek_config
+        self.open_ai_config = open_ai_config
 
     @singleton
     @provider
-    def provide_deep_seek_service(self, config: DeepSeekConfig) -> DeepSeekService:
+    def provide_deep_seek_service(
+        self, open_ai_service: OpenAiService
+    ) -> DeepSeekService:
         match self.service_type:
             case ServiceType.PRODUCTION:
-                return DeepSeekService(config)
+                return DeepSeekService(open_ai_service=open_ai_service)
             case ServiceType.MOCK:
                 return DeepSeekServiceMock()
 
     @singleton
     @provider
-    def provide_deep_seek_config(self) -> DeepSeekConfig:
-        return self.deep_seek_config
+    def provide_open_ai_service(self) -> OpenAiService:
+        return OpenAiService(config=self.open_ai_config)
+
+    @singleton
+    @provider
+    def provide_open_ai_config(self) -> OpenAIConfig:
+        return self.open_ai_config
 
 
 class ServicesInjector:
 
-    _injector: Injector = None
-    _injector_mock: Injector = None
+    __injector: Injector = None
+    __injector_mock: Injector = None
 
     @classmethod
     def injector(cls) -> Injector:
-        if not cls._injector:
+        if not cls.__injector:
             raise ValueError(
                 "Injector for production has not been initialized. Call init() before using it."
             )
-        return cls._injector
+        return cls.__injector
 
     @classmethod
     def injector_mock(cls) -> Injector:
-        if not cls._injector_mock:
+        if not cls.__injector_mock:
             raise ValueError(
                 "Injector for mock has not been initialized. Call init() before using it."
             )
-        return cls._injector_mock
+        return cls.__injector_mock
 
     @classmethod
     def init(cls):
 
-        ### DEEP SEEK CONFIG
-        ai_token = os.getenv("AI_TOKEN")
-        deep_seek_config: DeepSeekConfig = DeepSeekConfig(ai_token=ai_token)
+        ### CONFIGS
+        ai_api_key = os.getenv(DEEP_SEEK_API_KEY)
+        open_ai_config: OpenAIConfig = OpenAIConfig(ai_api_key=ai_api_key)
 
         ### INJECTIONS PROD
-        cls._injector = Injector(
+        cls.__injector = Injector(
             ServiceLocatorModule(
-                deep_seek_config=deep_seek_config,
+                open_ai_config=open_ai_config,
             ),
         )
 
         ### INJECTIONS MOCK
-        cls._injector_mock = Injector(
+        cls.__injector_mock = Injector(
             ServiceLocatorModule(
-                deep_seek_config=deep_seek_config,
-                service_type=ServiceType.MOCK,
+                service_type=ServiceType.MOCK, open_ai_config=open_ai_config
             ),
         )

@@ -8,7 +8,3 @@ class DeepSeekServiceBase(ABC):
     @abstractmethod
     def send_msg(self, messages: List[dict]) -> DeepSeekResponseModel:
         pass
-
-    @abstractmethod
-    def open_client(self):
-        pass
