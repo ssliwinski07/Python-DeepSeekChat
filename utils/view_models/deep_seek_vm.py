@@ -1,4 +1,6 @@
-from utils.services.API.DeepSeekService.deep_seek_service import DeepSeekService
+from utils.services.production.API.DeepSeekService.deep_seek_service import (
+    DeepSeekService,
+)
 from utils.models.DeepSeek.user_message_model import UserMessageModel
 from utils.models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
 from utils.consts.consts import USER_ROLE
