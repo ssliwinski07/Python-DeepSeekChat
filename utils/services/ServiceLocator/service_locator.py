@@ -12,6 +12,7 @@ from utils.services.production.DeepSeekService.deep_seek_service import (
 from utils.services.mock.DeepSeekService.deep_seek_service_mock import (
     DeepSeekServiceMock,
 )
+from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
 
 
 class ServiceLocatorModule(Module):
@@ -26,14 +27,27 @@ class ServiceLocatorModule(Module):
 
     def configure(self, binder):
         binder.bind(
-            DeepSeekService,
-            to=DeepSeekService(open_ai_service=self.deep_seek_config.open_ai_service),
+            DeepSeekServiceBase,
+            to=DeepSeekService(
+                open_ai_service=self.deep_seek_config.open_ai_service,
+            ),
+            scope=singleton,
+        )
+        binder.bind(
+            OpenAiService,
+            to=OpenAiService(
+                config=self.open_ai_config,
+            ),
             scope=singleton,
         )
 
+    # here we can map DeepSeekServiceBase (which is an interface) to DeepSeekService
+    # thanks to that when getting the service, we can pass the interface class name instead of class that implements it
+    # that's helpful when working with production services and mock services for tests - you don't need to change the name on the class when getting the service since both services are mapped to the base class
+    # look at the provide_deep_seek_service_mock in ServiceLocatorMockModule - it's also mapped with base class
     @provider
     @singleton
-    def provide_deep_seek_service(self) -> DeepSeekService:
+    def provide_deep_seek_service(self) -> DeepSeekServiceBase:
         return DeepSeekService(
             open_ai_service=self.deep_seek_config.open_ai_service,
         )
@@ -57,11 +71,11 @@ class ServiceLocatorModule(Module):
 class ServiceLocatorMockModule(Module):
 
     def configure(self, binder):
-        binder.bind(DeepSeekServiceMock, to=DeepSeekServiceMock(), scope=singleton)
+        binder.bind(DeepSeekServiceBase, to=DeepSeekServiceMock(), scope=singleton)
 
     @provider
     @singleton
-    def provide_deep_seek_service_mock(self) -> DeepSeekServiceMock:
+    def provide_deep_seek_service_mock(self) -> DeepSeekServiceBase:
         return DeepSeekServiceMock()
 
 
@@ -70,6 +84,7 @@ class ServicesInjector:
     __injector: Injector = None
     __injector_mock: Injector = None
 
+    # thanks to service_type we can choose the right module (ServiceLocatorMockModule or ServiceLocatorModule) to look for services during getting them.
     @classmethod
     def injector(cls, service_type: ServiceType) -> Injector:
         match service_type:

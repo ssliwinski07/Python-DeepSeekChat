@@ -7,6 +7,7 @@ from utils.services.mock.DeepSeekService.deep_seek_service_mock import (
 )
 from utils.services.ServiceLocator.service_locator import ServicesInjector
 from utils.view_models.deep_seek_vm import DeepSeekVM
+from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
 
 
 def main():
@@ -14,11 +15,14 @@ def main():
     try:
         ServicesInjector.init()
 
-        # injector for getting prod/mock services, pass ServiceType.MOCK or ServiceType.PRODUCTION to initalize get injector
-        injector = ServicesInjector.injector(service_type=ServiceType.PRODUCTION)
+        # Based on service_type parameter the right module is picked up to search in for the service to be returned
+        # For example when passing ServiceType.MOCK/ServiceType.PRODUCTION, ServicesInjector will search in ServiceLocatorMockModule/ServiceLocatorModule
+        # You can pass the base class name to get() function since it's implementations are mapped to base class in the module that is picked based on service_type parameter from ServicesInjector.injector()
+        # In that case, since service_type = ServiceType.PRODUCTION, injector will get DeepSeekService
+        # If you want to test the program and get generic replies (if you don't have api key from DeepSeek), you need to change service_type parameter to ServiceType.MOCK
+        injector = ServicesInjector.injector(service_type=ServiceType.MOCK)
 
-        # based on injector type (production/mock) pass DeepSeekService or DeepSeekServiceMock as a parameter of get function
-        deep_seek_service = injector.get(DeepSeekService)
+        deep_seek_service = injector.get(DeepSeekServiceBase)
 
         deep_seek_vm: DeepSeekVM = DeepSeekVM(deep_seek_service=deep_seek_service)
 
