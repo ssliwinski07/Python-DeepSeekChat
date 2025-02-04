@@ -1,7 +1,7 @@
-from utils.helpers.enums import ServiceType
-from utils.services.ServiceLocator.service_locator import ServicesInjector
-from utils.view_models.deep_seek_vm import DeepSeekVM
-from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
+from Utils.Helpers.enums import ServiceType
+from Utils.Services.ServiceLocator.service_locator import ServicesInjector
+from Utils.ViewModels.deep_seek_vm import DeepSeekVM
+from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 
 
 def main():
@@ -14,11 +14,13 @@ def main():
         # You can pass the base class name to get() function since it's implementations are mapped to base class in the module that is picked based on service_type parameter from ServicesInjector.injector()
         # In that case, since service_type = ServiceType.PRODUCTION, injector will get DeepSeekService
         # If you want to test the program and get generic replies (if you don't have api key from DeepSeek), you need to change service_type parameter to ServiceType.MOCK
-        injector = ServicesInjector.injector(service_type=ServiceType.PRODUCTION)
+        injector = ServicesInjector.injector(service_type=ServiceType.MOCK)
 
-        deep_seek_service = injector.get(DeepSeekServiceBase)
+        open_ai_service = injector.get(OpenAiServiceBase)
 
-        deep_seek_vm: DeepSeekVM = DeepSeekVM(deep_seek_service=deep_seek_service)
+        deep_seek_vm: DeepSeekVM = DeepSeekVM(
+            open_ai_service=open_ai_service,
+        )
 
         deep_seek_vm.start_chat()
     except Exception as e:

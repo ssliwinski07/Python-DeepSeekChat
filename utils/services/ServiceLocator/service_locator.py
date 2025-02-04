@@ -1,18 +1,12 @@
 import os
 from injector import Injector, Module, provider, singleton
 
-from utils.helpers.enums import ServiceType
-from utils.services.ServiceLocator.configs.deep_seek_config import DeepSeekConfig
-from utils.services.ServiceLocator.configs.open_ai_config import OpenAIConfig
-from utils.services.API.open_ai_service import OpenAiService
-from utils.consts.consts import DEEP_SEEK_API_KEY
-from utils.services.production.DeepSeekService.deep_seek_service import (
-    DeepSeekService,
-)
-from utils.services.mock.DeepSeekService.deep_seek_service_mock import (
-    DeepSeekServiceMock,
-)
-from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
+from Utils.Helpers.enums import ServiceType
+from Utils.Services.ServiceLocator.configs.open_ai_config import OpenAIConfig
+from Utils.Services.API.Production.open_ai_service import OpenAiService
+from Utils.Consts.consts import DEEP_SEEK_API_KEY
+from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
+from Utils.Services.API.Mock.open_ai_service_mock import OpenAiServiceMock
 
 
 class ServiceLocatorModule(Module):
@@ -20,21 +14,12 @@ class ServiceLocatorModule(Module):
     def __init__(
         self,
         open_ai_config: OpenAIConfig,
-        deep_seek_config: DeepSeekConfig,
     ):
         self.open_ai_config = open_ai_config
-        self.deep_seek_config = deep_seek_config
 
     def configure(self, binder):
         binder.bind(
-            DeepSeekServiceBase,
-            to=DeepSeekService(
-                open_ai_service=self.deep_seek_config.open_ai_service,
-            ),
-            scope=singleton,
-        )
-        binder.bind(
-            OpenAiService,
+            OpenAiServiceBase,
             to=OpenAiService(
                 config=self.open_ai_config,
             ),
@@ -47,14 +32,7 @@ class ServiceLocatorModule(Module):
     # look at the provide_deep_seek_service_mock in ServiceLocatorMockModule - it's also mapped with base class
     @provider
     @singleton
-    def provide_deep_seek_service(self) -> DeepSeekServiceBase:
-        return DeepSeekService(
-            open_ai_service=self.deep_seek_config.open_ai_service,
-        )
-
-    @provider
-    @singleton
-    def provide_open_ai_service(self) -> OpenAiService:
+    def provide_open_ai_service(self) -> OpenAiServiceBase:
         return OpenAiService(config=self.open_ai_config)
 
     @provider
@@ -62,21 +40,16 @@ class ServiceLocatorModule(Module):
     def provide_open_ai_config(self) -> OpenAIConfig:
         return self.open_ai_config
 
-    @provider
-    @singleton
-    def provide_deep_seek_config(self) -> DeepSeekConfig:
-        return self.deep_seek_config
-
 
 class ServiceLocatorMockModule(Module):
 
     def configure(self, binder):
-        binder.bind(DeepSeekServiceBase, to=DeepSeekServiceMock(), scope=singleton)
+        binder.bind(OpenAiServiceBase, to=OpenAiServiceMock(), scope=singleton)
 
     @provider
     @singleton
-    def provide_deep_seek_service_mock(self) -> DeepSeekServiceBase:
-        return DeepSeekServiceMock()
+    def provide_deep_seek_service_mock(self) -> OpenAiServiceBase:
+        return OpenAiServiceMock()
 
 
 class ServicesInjector:
@@ -107,16 +80,11 @@ class ServicesInjector:
         ai_api_key = os.getenv(DEEP_SEEK_API_KEY)
 
         open_ai_config: OpenAIConfig = OpenAIConfig(ai_api_key=ai_api_key)
-        open_ai_service: OpenAiService = OpenAiService(config=open_ai_config)
-        deep_seek_config: DeepSeekConfig = DeepSeekConfig(
-            open_ai_service=open_ai_service
-        )
 
         ### INJECTIONS PROD
         cls.__injector = Injector(
             ServiceLocatorModule(
                 open_ai_config=open_ai_config,
-                deep_seek_config=deep_seek_config,
             ),
             auto_bind=False,
         )
