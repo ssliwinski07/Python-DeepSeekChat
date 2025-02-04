@@ -1,5 +1,4 @@
-from injector import Injector
-
+from utils.helpers.enums import ServiceType
 from utils.services.production.DeepSeekService.deep_seek_service import (
     DeepSeekService,
 )
@@ -15,13 +14,11 @@ def main():
     try:
         ServicesInjector.init()
 
-        ### injector for prod service
-        injector = ServicesInjector.injector()
-        deep_seek_service = injector.get(DeepSeekService)
+        # injector for getting prod/mock services, pass ServiceType.MOCK or ServiceType.PRODUCTION to initalize get injector
+        injector = ServicesInjector.injector(service_type=ServiceType.PRODUCTION)
 
-        ### injector for mock service
-        # injector_mock: Injector = ServicesInjector.injector_mock()
-        # deep_seek_service = injector_mock.get(DeepSeekServiceMock)
+        # based on injector type (production/mock) pass DeepSeekService or DeepSeekServiceMock as a parameter of get function
+        deep_seek_service = injector.get(DeepSeekService)
 
         deep_seek_vm: DeepSeekVM = DeepSeekVM(deep_seek_service=deep_seek_service)
 
