@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from utils.models.DeepSeek.deep_seek_message_model import DeepSeekMessageModel
+
+from Utils.Models.DeepSeek.deep_seek_message_model import DeepSeekMessageModel
 
 
 class DeepSeekChoiceModel(BaseModel):

@@ -3,13 +3,14 @@ from typing import List
 from injector import singleton
 from openai.types.chat import ChatCompletion
 
-from utils.models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
-from utils.services.ServiceLocator.configs.open_ai_config import OpenAIConfig
-from utils.consts.consts import BASE_API, DEEP_SEEK_CHAT_MODEL
+from Utils.Models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
+from Utils.Services.ServiceLocator.configs.open_ai_config import OpenAIConfig
+from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
+from Utils.Consts.consts import BASE_API, DEEP_SEEK_CHAT_MODEL
 
 
 @singleton
-class OpenAiService:
+class OpenAiService(OpenAiServiceBase):
 
     def __init__(self, config: OpenAIConfig):
         self.config = config

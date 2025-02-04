@@ -1,13 +1,16 @@
-from utils.models.DeepSeek.user_message_model import UserMessageModel
-from utils.models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
-from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
-from utils.consts.consts import USER_ROLE
+from Utils.Models.DeepSeek.user_message_model import UserMessageModel
+from Utils.Models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
+from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
+from Utils.Consts.consts import USER_ROLE
 
 
 class DeepSeekVM:
 
-    def __init__(self, deep_seek_service: DeepSeekServiceBase):
-        self.deep_seek_service = deep_seek_service
+    def __init__(
+        self,
+        open_ai_service: OpenAiServiceBase,
+    ):
+        self.open_ai_service = open_ai_service
 
     def start_chat(self):
         print("DeepSeek: type 'exit deepseek' to end the conversation")
@@ -27,7 +30,7 @@ class DeepSeekVM:
 
             messages.append(user_msg.model_dump())
 
-            reply: DeepSeekResponseModel = self.deep_seek_service.send_msg(
+            reply: DeepSeekResponseModel = self.open_ai_service.message(
                 messages=messages
             )
 
