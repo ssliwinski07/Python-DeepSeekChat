@@ -5,7 +5,6 @@ from injector import singleton
 
 from utils.consts.consts import BASE_API, DEEP_SEEK_CHAT_MODEL
 from utils.models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
-from utils.services.ServiceLocator.configs.deep_seek_config import DeepSeekConfig
 from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
 from utils.services.API.open_ai_service import OpenAiService
 

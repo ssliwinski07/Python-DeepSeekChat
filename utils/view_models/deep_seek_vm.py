@@ -1,6 +1,3 @@
-from utils.services.production.DeepSeekService.deep_seek_service import (
-    DeepSeekService,
-)
 from utils.models.DeepSeek.user_message_model import UserMessageModel
 from utils.models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
 from utils.services.base.deep_seek_service_base import DeepSeekServiceBase

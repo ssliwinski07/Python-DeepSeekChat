@@ -19,31 +19,50 @@ class ServiceLocatorModule(Module):
     def __init__(
         self,
         open_ai_config: OpenAIConfig,
-        service_type: ServiceType = ServiceType.PRODUCTION,
+        deep_seek_config: DeepSeekConfig,
     ):
-        self.service_type = service_type
         self.open_ai_config = open_ai_config
+        self.deep_seek_config = deep_seek_config
 
-    @singleton
-    @provider
-    def provide_deep_seek_service(
-        self, open_ai_service: OpenAiService
-    ) -> DeepSeekService:
-        match self.service_type:
-            case ServiceType.PRODUCTION:
-                return DeepSeekService(open_ai_service=open_ai_service)
-            case ServiceType.MOCK:
-                return DeepSeekServiceMock()
+    def configure(self, binder):
+        binder.bind(
+            DeepSeekService,
+            to=DeepSeekService(open_ai_service=self.deep_seek_config.open_ai_service),
+            scope=singleton,
+        )
 
-    @singleton
     @provider
+    @singleton
+    def provide_deep_seek_service(self) -> DeepSeekService:
+        return DeepSeekService(
+            open_ai_service=self.deep_seek_config.open_ai_service,
+        )
+
+    @provider
+    @singleton
     def provide_open_ai_service(self) -> OpenAiService:
         return OpenAiService(config=self.open_ai_config)
 
-    @singleton
     @provider
+    @singleton
     def provide_open_ai_config(self) -> OpenAIConfig:
         return self.open_ai_config
+
+    @provider
+    @singleton
+    def provide_deep_seek_config(self) -> DeepSeekConfig:
+        return self.deep_seek_config
+
+
+class ServiceLocatorMockModule(Module):
+
+    def configure(self, binder):
+        binder.bind(DeepSeekServiceMock, to=DeepSeekServiceMock(), scope=singleton)
+
+    @provider
+    @singleton
+    def provide_deep_seek_service_mock(self) -> DeepSeekServiceMock:
+        return DeepSeekServiceMock()
 
 
 class ServicesInjector:
@@ -52,38 +71,43 @@ class ServicesInjector:
     __injector_mock: Injector = None
 
     @classmethod
-    def injector(cls) -> Injector:
-        if not cls.__injector:
-            raise ValueError(
-                "Injector for production has not been initialized. Call init() before using it."
-            )
-        return cls.__injector
-
-    @classmethod
-    def injector_mock(cls) -> Injector:
-        if not cls.__injector_mock:
-            raise ValueError(
-                "Injector for mock has not been initialized. Call init() before using it."
-            )
-        return cls.__injector_mock
+    def injector(cls, service_type: ServiceType) -> Injector:
+        match service_type:
+            case ServiceType.PRODUCTION:
+                if not cls.__injector:
+                    raise ValueError(
+                        "Injector for production has not been initialized. Call ServicesInjector.init() before using it."
+                    )
+                return cls.__injector
+            case ServiceType.MOCK:
+                if not cls.__injector_mock:
+                    raise ValueError(
+                        "Injector for mock has not been initialized. Call ServicesInjector.init() before using it."
+                    )
+                return cls.__injector_mock
 
     @classmethod
     def init(cls):
-
-        ### CONFIGS
+        ### CONFIGS/SERVICES
         ai_api_key = os.getenv(DEEP_SEEK_API_KEY)
+
         open_ai_config: OpenAIConfig = OpenAIConfig(ai_api_key=ai_api_key)
+        open_ai_service: OpenAiService = OpenAiService(config=open_ai_config)
+        deep_seek_config: DeepSeekConfig = DeepSeekConfig(
+            open_ai_service=open_ai_service
+        )
 
         ### INJECTIONS PROD
         cls.__injector = Injector(
             ServiceLocatorModule(
                 open_ai_config=open_ai_config,
+                deep_seek_config=deep_seek_config,
             ),
+            auto_bind=False,
         )
 
         ### INJECTIONS MOCK
         cls.__injector_mock = Injector(
-            ServiceLocatorModule(
-                service_type=ServiceType.MOCK, open_ai_config=open_ai_config
-            ),
+            ServiceLocatorMockModule(),
+            auto_bind=False,
         )
