@@ -1,10 +1,4 @@
 from utils.helpers.enums import ServiceType
-from utils.services.production.DeepSeekService.deep_seek_service import (
-    DeepSeekService,
-)
-from utils.services.mock.DeepSeekService.deep_seek_service_mock import (
-    DeepSeekServiceMock,
-)
 from utils.services.ServiceLocator.service_locator import ServicesInjector
 from utils.view_models.deep_seek_vm import DeepSeekVM
 from utils.services.base.deep_seek_service_base import DeepSeekServiceBase
