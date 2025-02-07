@@ -3,7 +3,10 @@ from typing import List
 from injector import singleton
 from openai.types.chat import ChatCompletion
 
+from Utils.Helpers.errors import OPEN_AI_ERRORS
 from Utils.Models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
+from Utils.Models.DeepSeek.deep_seek_choice_model import DeepSeekChoiceModel
+from Utils.Models.DeepSeek.deep_seek_message_model import DeepSeekMessageModel
 from Utils.Services.ServiceLocator.configs.open_ai_config import OpenAIConfig
 from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 from Utils.Consts.consts import BASE_API, DEEP_SEEK_CHAT_MODEL
@@ -37,20 +40,18 @@ class OpenAiService(OpenAiServiceBase):
                 stream=False,
             )
 
-            ##choices = [DeepSeekChoiceModel(**choice) for choice in response.choices]
+            choices = [
+                DeepSeekChoiceModel(
+                    message=DeepSeekMessageModel(content=choice.message.content)
+                )
+                for choice in response.choices
+            ]
 
-            result: DeepSeekResponseModel = DeepSeekResponseModel(
-                choices=response.choices
-            )
+            result: DeepSeekResponseModel = DeepSeekResponseModel(choices=choices)
 
             return result
-        except (
-            openai.AuthenticationError,
-            openai.BadRequestError,
-            openai.RateLimitError,
-            openai.APIConnectionError,
-        ) as e:
-            raise ValueError(f"{e.body['message']}")
+        except OPEN_AI_ERRORS as e:
+            raise ValueError(f"{e.body['message']}, code: {e.body['code']}")
 
         except Exception as e:
             raise ValueError(f"{e}")
