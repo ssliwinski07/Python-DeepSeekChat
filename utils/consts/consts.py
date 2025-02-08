@@ -1,15 +1,9 @@
-# APIs
-BASE_API = "https://api.deepseek.com"
+### AI CHAT - SYSTEM VARIABLES
 
+BASE_API = "BASE_API"
+CHAT_MODEL = "CHAT_MODEL"
+API_KEY = "API_KEY"
 
-# AI MODELS
-
-DEEP_SEEK_CHAT_MODEL = "deepseek-chat"
-
-# ROLES
+### AI CHAT - others
 
 USER_ROLE = "user"
-
-# API KEYS
-
-DEEP_SEEK_API_KEY = "DEEP_SEEK_API_KEY"

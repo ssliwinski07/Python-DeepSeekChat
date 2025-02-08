@@ -14,7 +14,7 @@ def main():
         # You can pass the base class name to get() function since it's implementations are mapped to base class in the module that is picked based on service_type parameter from ServicesInjector.injector()
         # In that case, since service_type = ServiceType.PRODUCTION, injector will get DeepSeekService
         # If you want to test the program and get generic replies (if you don't have api key from DeepSeek), you need to change service_type parameter to ServiceType.MOCK
-        injector = ServicesInjector.injector(service_type=ServiceType.PRODUCTION)
+        injector = ServicesInjector.injector(service_type=ServiceType.MOCK)
 
         open_ai_service = injector.get(OpenAiServiceBase)
 

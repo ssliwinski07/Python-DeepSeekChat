@@ -13,12 +13,12 @@ class DeepSeekVM:
         self.open_ai_service = open_ai_service
 
     def start_chat(self):
-        print("DeepSeek: type 'exit deepseek' to end the conversation")
+        print("OpenAi: type 'exit' to end the conversation")
 
         while True:
             user_input = input("You: ")
 
-            if user_input.lower() == "exit deepseek":
+            if user_input.lower() == "exit":
                 print("See ya!")
                 break
 
@@ -34,4 +34,4 @@ class DeepSeekVM:
                 messages=messages
             )
 
-            print(f"DeepSeek: {reply.choices[0].message.content}")
+            print(f"OpenAi: {reply.choices[0].message.content}")

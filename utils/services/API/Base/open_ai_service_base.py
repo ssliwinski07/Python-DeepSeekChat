@@ -7,7 +7,7 @@ from Utils.Models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
 class OpenAiServiceBase(ABC):
 
     @abstractmethod
-    def open_client(seld):
+    def open_client(self):
         pass
 
     @abstractmethod
