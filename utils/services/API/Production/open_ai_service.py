@@ -9,7 +9,6 @@ from Utils.Models.DeepSeek.deep_seek_choice_model import DeepSeekChoiceModel
 from Utils.Models.DeepSeek.deep_seek_message_model import DeepSeekMessageModel
 from Utils.Services.ServiceLocator.configs.open_ai_config import OpenAIConfig
 from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
-from Utils.Consts.consts import BASE_API, DEEP_SEEK_CHAT_MODEL
 
 
 @singleton
@@ -22,11 +21,17 @@ class OpenAiService(OpenAiServiceBase):
 
     def open_client(self):
         if not self.__client:
-            if not self.config.ai_api_key:
-                raise ValueError("system variable with token is not set")
+            if (
+                not self.config.ai_api_key
+                or not self.config.base_api
+                or not self.config.chat_model
+            ):
+                raise ValueError(
+                    "System variable 'BASE_API' or 'API_KEY' or 'CHAT_MODEL' is not set"
+                )
 
             self.__client = openai.OpenAI(
-                api_key=self.config.ai_api_key, base_url=BASE_API
+                api_key=self.config.ai_api_key, base_url=self.config.base_api
             )
 
     def message(self, messages: List[dict]) -> DeepSeekResponseModel:
@@ -35,7 +40,7 @@ class OpenAiService(OpenAiServiceBase):
 
         try:
             response: ChatCompletion = self.__client.chat.completions.create(
-                model=DEEP_SEEK_CHAT_MODEL,
+                model=self.config.chat_model,
                 messages=messages,
                 stream=False,
             )

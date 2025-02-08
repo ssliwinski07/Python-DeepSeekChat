@@ -1,5 +1,11 @@
-# Python-DeepSeekChat
+# Python-OpenAIChat
 
-1. Chat-like terminal app using DeepSeek model
-2. API token should be stored in environment variable called DEEP_SEEK_API_KEY. To apply for an API key, please visit: https://api-docs.deepseek.com/
-3. There's a mock service (DeepSeekServiceMock) for testing. Have a look at the comments in main.py to learn how to use it
+Before running the terminal app, you need to set three system variables:
+
+- "BASE_API" - API URL of chosen ai chat, for example https://api.deepseek.com or https://api.openai.com
+- "CHAT_MODEL" - for example "deepseek-chat" or "gpt-4o-mini"
+- "API_KEY" - your personal API key of the chat model
+
+NOTES:
+
+1. There's a mock service (OpenAiServiceMock) for testing. Have a look at the comments in main.py to learn how to use it

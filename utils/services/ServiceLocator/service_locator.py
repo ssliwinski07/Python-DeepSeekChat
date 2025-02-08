@@ -4,7 +4,7 @@ from injector import Injector, Module, provider, singleton
 from Utils.Helpers.enums import ServiceType
 from Utils.Services.ServiceLocator.configs.open_ai_config import OpenAIConfig
 from Utils.Services.API.Production.open_ai_service import OpenAiService
-from Utils.Consts.consts import DEEP_SEEK_API_KEY
+from Utils.Consts.consts import API_KEY, CHAT_MODEL, BASE_API
 from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 from Utils.Services.API.Mock.open_ai_service_mock import OpenAiServiceMock
 
@@ -77,9 +77,15 @@ class ServicesInjector:
     @classmethod
     def init(cls):
         ### CONFIGS/SERVICES
-        ai_api_key = os.getenv(DEEP_SEEK_API_KEY)
+        ai_api_key: str = os.getenv(API_KEY)
+        chat_model: str = os.getenv(CHAT_MODEL)
+        base_api: str = os.getenv(BASE_API)
 
-        open_ai_config: OpenAIConfig = OpenAIConfig(ai_api_key=ai_api_key)
+        open_ai_config: OpenAIConfig = OpenAIConfig(
+            ai_api_key=ai_api_key,
+            chat_model=chat_model,
+            base_api=base_api,
+        )
 
         ### INJECTIONS PROD
         cls.__injector = Injector(
