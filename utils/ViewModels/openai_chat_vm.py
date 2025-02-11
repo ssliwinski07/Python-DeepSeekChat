@@ -1,5 +1,5 @@
-from Utils.Models.DeepSeek.user_message_model import UserMessageModel
-from Utils.Models.DeepSeek.openai_response_model import OpenAiResponseModel
+from Utils.Models.OpenAI.user_message_model import UserMessageModel
+from Utils.Models.OpenAI.openai_response_model import OpenAiResponseModel
 from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 from Utils.Consts.consts import USER_ROLE
 from typing import List
