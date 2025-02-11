@@ -31,7 +31,6 @@ class OpenAiChatVM:
                     role=USER_ROLE, content=user_input
                 )
 
-                # Add user message to history
                 self.conversation_history.append(user_msg.model_dump())
 
                 try:
