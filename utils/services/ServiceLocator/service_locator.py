@@ -26,10 +26,7 @@ class ServiceLocatorModule(Module):
             scope=singleton,
         )
 
-    # here we can map DeepSeekServiceBase (which is an interface) to DeepSeekService
-    # thanks to that when getting the service, we can pass the interface class name instead of class that implements it
-    # that's helpful when working with production services and mock services for tests - you don't need to change the name on the class when getting the service since both services are mapped to the base class
-    # look at the provide_deep_seek_service_mock in ServiceLocatorMockModule - it's also mapped with base class
+    # Map OpenAiServiceBase interface to concrete implementation
     @provider
     @singleton
     def provide_open_ai_service(self) -> OpenAiServiceBase:
@@ -48,7 +45,7 @@ class ServiceLocatorMockModule(Module):
 
     @provider
     @singleton
-    def provide_deep_seek_service_mock(self) -> OpenAiServiceBase:
+    def provide_open_ai_service_mock(self) -> OpenAiServiceBase:
         return OpenAiServiceMock()
 
 

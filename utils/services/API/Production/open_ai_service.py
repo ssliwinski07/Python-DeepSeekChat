@@ -4,9 +4,9 @@ from injector import singleton
 from openai.types.chat import ChatCompletion
 
 from Utils.Helpers.errors import OPEN_AI_ERRORS
-from Utils.Models.DeepSeek.deep_seek_response_model import DeepSeekResponseModel
-from Utils.Models.DeepSeek.deep_seek_choice_model import DeepSeekChoiceModel
-from Utils.Models.DeepSeek.deep_seek_message_model import DeepSeekMessageModel
+from Utils.Models.OpenAI.openai_response_model import OpenAiResponseModel
+from Utils.Models.OpenAI.openai_choice_model import OpenAiChoiceModel
+from Utils.Models.OpenAI.openai_message_model import OpenAiMessageModel
 from Utils.Services.ServiceLocator.configs.open_ai_config import OpenAIConfig
 from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 
@@ -34,7 +34,7 @@ class OpenAiService(OpenAiServiceBase):
                 api_key=self.config.ai_api_key, base_url=self.config.base_api
             )
 
-    def message(self, messages: List[dict]) -> DeepSeekResponseModel:
+    def message(self, messages: List[dict]) -> OpenAiResponseModel:
 
         self.open_client()
 
@@ -46,13 +46,13 @@ class OpenAiService(OpenAiServiceBase):
             )
 
             choices = [
-                DeepSeekChoiceModel(
-                    message=DeepSeekMessageModel(content=choice.message.content)
+                OpenAiChoiceModel(
+                    message=OpenAiMessageModel(content=choice.message.content)
                 )
                 for choice in response.choices
             ]
 
-            result: DeepSeekResponseModel = DeepSeekResponseModel(choices=choices)
+            result: OpenAiResponseModel = OpenAiResponseModel(choices=choices)
 
             return result
         except OPEN_AI_ERRORS as e:

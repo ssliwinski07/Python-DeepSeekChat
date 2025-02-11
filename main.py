@@ -1,6 +1,6 @@
 from Utils.Helpers.enums import ServiceType
 from Utils.Services.ServiceLocator.service_locator import ServicesInjector
-from Utils.ViewModels.deep_seek_vm import DeepSeekVM
+from Utils.ViewModels.openai_chat_vm import OpenAiChatVM
 from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 
 
@@ -18,7 +18,7 @@ def main():
 
         open_ai_service = injector.get(OpenAiServiceBase)
 
-        deep_seek_vm: DeepSeekVM = DeepSeekVM(
+        deep_seek_vm: OpenAiChatVM = OpenAiChatVM(
             open_ai_service=open_ai_service,
         )
 
