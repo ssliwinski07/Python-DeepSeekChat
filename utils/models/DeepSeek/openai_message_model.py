@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
 
-class DeepSeekMessageModel(BaseModel):
-
+class OpenAiMessageModel(BaseModel):
     content: str
