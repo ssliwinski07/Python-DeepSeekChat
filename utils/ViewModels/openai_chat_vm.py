@@ -36,16 +36,14 @@ class OpenAiChatVM:
 
                 try:
                     reply: OpenAiResponseModel = self.open_ai_service.message(
-                        messages=self.conversation_history
+                        message=user_msg
                     )
 
-                    assistant_message = reply.choices[0].message.content
-                    print(f"OpenAi: {assistant_message}")
+                    assistant_reply = reply.choices[0].message
+                    print(f"OpenAi: {assistant_reply.content}")
 
                     # Add assistant's reply to history
-                    self.conversation_history.append(
-                        reply.choices[0].message.model_dump()
-                    )
+                    self.conversation_history.append(assistant_reply.model_dump())
 
                 except Exception as api_error:
                     print(f"Error getting response from OpenAI: {api_error}")

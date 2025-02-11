@@ -1,12 +1,15 @@
 import openai
-from typing import List
 from injector import singleton
-from openai.types.chat import ChatCompletion
+from openai.types.chat import (
+    ChatCompletion,
+    ChatCompletionUserMessageParam,
+)
 
 from Utils.Helpers.errors import OPEN_AI_ERRORS
 from Utils.Models.OpenAI.openai_response_model import OpenAiResponseModel
 from Utils.Models.OpenAI.openai_choice_model import OpenAiChoiceModel
 from Utils.Models.OpenAI.openai_message_model import OpenAiMessageModel
+from Utils.Models.OpenAI.user_message_model import UserMessageModel
 from Utils.Services.ServiceLocator.configs.open_ai_config import OpenAIConfig
 from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 
@@ -16,33 +19,37 @@ class OpenAiService(OpenAiServiceBase):
 
     def __init__(self, config: OpenAIConfig):
         self.config = config
+        self.openai_client = self.__initialize_client()
 
-    __client: openai.OpenAI = None
-
-    def open_client(self):
-        if not self.__client:
-            if (
-                not self.config.ai_api_key
-                or not self.config.base_api
-                or not self.config.chat_model
-            ):
-                raise ValueError(
-                    "System variable 'BASE_API' or 'API_KEY' or 'CHAT_MODEL' is not set"
-                )
-
-            self.__client = openai.OpenAI(
-                api_key=self.config.ai_api_key, base_url=self.config.base_api
+    def __initialize_client(self):
+        if (
+            not self.config.ai_api_key
+            or not self.config.base_api
+            or not self.config.chat_model
+        ):
+            raise ValueError(
+                "System variable 'BASE_API' or 'API_KEY' or 'CHAT_MODEL' is not set"
             )
 
-    def message(self, messages: List[dict]) -> OpenAiResponseModel:
+        openai_client: openai.OpenAI = openai.OpenAI(
+            api_key=self.config.ai_api_key, base_url=self.config.base_api
+        )
 
-        self.open_client()
+        return openai_client
+
+    def message(self, message: UserMessageModel) -> OpenAiResponseModel:
 
         try:
-            response: ChatCompletion = self.__client.chat.completions.create(
+            messages = [
+                ChatCompletionUserMessageParam(
+                    role=message.role,
+                    content=message.content,
+                )
+            ]
+
+            response: ChatCompletion = self.openai_client.chat.completions.create(
                 model=self.config.chat_model,
                 messages=messages,
-                stream=False,
             )
 
             choices = [
@@ -55,8 +62,13 @@ class OpenAiService(OpenAiServiceBase):
             result: OpenAiResponseModel = OpenAiResponseModel(choices=choices)
 
             return result
+
         except OPEN_AI_ERRORS as e:
-            raise ValueError(f"{e.body['message']}, code: {e.body['code']}")
+            error_message = getattr(e, "message", str(e))
+            error_code = getattr(e, "code", "No code")
+            raise ValueError(
+                f"OpenAI Error - Message: {error_message}, Code: {error_code}"
+            )
 
         except Exception as e:
-            raise ValueError(f"{e}")
+            raise ValueError(f"Unexpected error: {e}")
