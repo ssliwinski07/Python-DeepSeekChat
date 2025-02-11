@@ -5,7 +5,6 @@ from Utils.Models.OpenAI.openai_response_model import OpenAiResponseModel
 
 
 class OpenAiServiceBase(ABC):
-    """Base class for OpenAI service implementations."""
 
     @abstractmethod
     def open_client(self):
@@ -13,5 +12,4 @@ class OpenAiServiceBase(ABC):
 
     @abstractmethod
     def message(self, messages: List[dict]) -> OpenAiResponseModel:
-        """Send a message to OpenAI API and get a response."""
         pass
