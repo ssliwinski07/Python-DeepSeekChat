@@ -4,7 +4,7 @@ from Utils.Services.API.Base.open_ai_service_base import OpenAiServiceBase
 from Utils.Consts.consts import USER_ROLE
 
 
-class DeepSeekVM:
+class OpenAiChatVM:
 
     def __init__(
         self,
